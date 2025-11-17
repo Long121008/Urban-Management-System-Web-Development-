@@ -12,8 +12,6 @@ const TaskUpdatePage = Loadable(lazy(() => import('views/engineer/taskUpdatePage
 const HistoryPage = Loadable(lazy(() => import('views/engineer/historyPage')));
 const MyTaskPage = Loadable(lazy(() => import('views/engineer/myTaskPage')));
 
-// sample page routing
-const SamplePage = Loadable(lazy(() => import('views/sample-page')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
