@@ -27,3 +27,10 @@ curl -X POST http://localhost:5000/api/auth/register \
     "password": "121212",
     "role": "citizen"
   }'
+
+
+
+
+
+Cập nhật: SỬa MONGODB_URI để dùng server online, dùng chuỗi sau MONGODB_URI=mongodb+srv://nhom06_admin:mricml@cluster0.plqfxwu.mongodb.net/UrbanIncidentDB?retryWrites=true&w=majority
+Trước khi chạy thì install driver: npm install mongodb
