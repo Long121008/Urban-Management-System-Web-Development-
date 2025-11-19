@@ -30,9 +30,10 @@ export default function TeamPerformanceChart() {
     <Card
       sx={{
         height: '100%',
+        background: 'linear-gradient(135deg, #23272f 0%, #2c313a 100%)',
         boxShadow: 2,
         borderRadius: 2,
-        backgroundColor: '#FAFAFA'
+        color: '#e0e0e0'
       }}
     >
       <CardContent>
@@ -47,12 +48,12 @@ export default function TeamPerformanceChart() {
               data={data}
               margin={{ top: 20, right: 30, left: 20, bottom: 0 }}
             >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis type="number" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+              <XAxis type="number" tick={{ fill: '#e0e0e0' }} />
               <YAxis
                 dataKey="team"
                 type="category"
-                tick={{ fontSize: 13 }}
+                tick={{ fontSize: 13, fill: '#e0e0e0' }}
                 width={80}
               />
               <Tooltip
@@ -61,23 +62,11 @@ export default function TeamPerformanceChart() {
                     ? [`${value} giờ`, 'Thời gian trung bình']
                     : [`${value} nhiệm vụ`, 'Hoàn thành']
                 }
-                contentStyle={{ backgroundColor: '#fff', borderRadius: '8px' }}
+                contentStyle={{ backgroundColor: '#23272f', color: '#e0e0e0', borderRadius: '8px' }}
               />
-              <Legend verticalAlign="bottom" height={36} />
-              <Bar
-                dataKey="completed"
-                name="Nhiệm vụ hoàn thành"
-                fill={COLORS.completed}
-                barSize={15}
-                radius={[5, 5, 0, 0]}
-              />
-              <Bar
-                dataKey="avgTime"
-                name="Thời gian trung bình (giờ)"
-                fill={COLORS.avgTime}
-                barSize={15}
-                radius={[5, 5, 0, 0]}
-              />
+              <Legend verticalAlign="bottom" height={36} wrapperStyle={{ color: '#e0e0e0' }} />
+              <Bar dataKey="completed" name="Hoàn thành" fill={COLORS.completed} barSize={15} radius={[5, 5, 0, 0]} />
+              <Bar dataKey="avgTime" name="Thời gian trung bình (giờ)" fill={COLORS.avgTime} barSize={15} radius={[5, 5, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </Box>

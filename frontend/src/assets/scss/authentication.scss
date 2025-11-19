@@ -1,0 +1,33 @@
+.shape-neon-1,
+.shape-neon-2 {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.33;
+  animation: floatAnim 12s infinite ease-in-out alternate;
+}
+
+.shape-neon-1 {
+  width: 350px;
+  height: 350px;
+  background: #38bdf8;
+  top: 10%;
+  left: 5%;
+}
+
+.shape-neon-2 {
+  width: 280px;
+  height: 280px;
+  background: #818cf8;
+  bottom: 8%;
+  right: 10%;
+}
+
+@keyframes floatAnim {
+  0% {
+    transform: translateY(0px);
+  }
+  100% {
+    transform: translateY(-40px);
+  }
+}

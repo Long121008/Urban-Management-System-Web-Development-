@@ -1,62 +1,153 @@
-// this is the parent page, while the uath-forms/AuthLogin is just the login box region only
 import { Link } from 'react-router-dom';
-
 import useMediaQuery from '@mui/material/useMediaQuery';
-import Divider from '@mui/material/Divider';
-import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
+import { Box, Stack, Typography, Container, Card } from '@mui/material';
 
-// project imports
-import AuthWrapper1 from './AuthWrapper1';
-import AuthCardWrapper from './AuthCardWrapper';
-
-import Logo from 'ui-component/Logo';
-import AuthFooter from 'ui-component/cards/AuthFooter';
 import AuthLogin from '../auth-forms/AuthLogin';
-
-// ================================|| AUTH3 - LOGIN ||================================ //
+import Logo from 'ui-component/Logo';
+import CityNight from "../../../assets/city_night.jpg";
 
 export default function Login() {
   const downMD = useMediaQuery((theme) => theme.breakpoints.down('md'));
 
   return (
-    <AuthWrapper1>
-      <Stack sx={{ justifyContent: 'flex-end', minHeight: '100vh' }}>
-        <Stack sx={{ justifyContent: 'center', alignItems: 'center', minHeight: 'calc(100vh - 68px)' }}>
-          <Box sx={{ m: { xs: 1, sm: 3 }, mb: 0 }}>
-            <AuthCardWrapper>
-              <Stack sx={{ alignItems: 'center', justifyContent: 'center', gap: 2 }}>
-                <Box sx={{ mb: 3 }}>
-                  <Link to="#" aria-label="logo">
-                    <Logo />
-                  </Link>
-                </Box>
-                <Stack sx={{ alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-                  <Typography variant={downMD ? 'h3' : 'h2'} sx={{ color: 'secondary.main' }}>
-                    Hi, Welcome Back
-                  </Typography>
-                  <Typography variant="caption" sx={{ fontSize: '16px', textAlign: { xs: 'center', md: 'inherit' } }}>
-                    Enter your credentials to continue
-                  </Typography>
-                </Stack>
-                <Box sx={{ width: 1 }}>
-                  <AuthLogin />
-                </Box>
-                <Divider sx={{ width: 1 }} />
-                <Stack sx={{ alignItems: 'center' }}>
-                  <Typography component={Link} to="/pages/register" variant="subtitle1" sx={{ textDecoration: 'none' }}>
-                    Don&apos;t have an account?
-                  </Typography>
-                </Stack>
-              </Stack>
-            </AuthCardWrapper>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        bgcolor: '#0c0f26',
+        position: 'relative',
+        overflow: 'hidden'
+      }}
+    >
+      {/* ---- Blurry background image ---- */}
+      <Box
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage: `url(${CityNight})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          filter: 'blur(14px) brightness(0.45)',
+          zIndex: 0
+        }}
+      />
+
+      {/* ---- LEFT TEXT CONTENT ---- */}
+      {!downMD && (
+        <Box
+          sx={{
+            width: '45%',
+            display: 'flex',
+            alignItems: 'center',
+            pl: '6vw',
+            zIndex: 2,
+            color: 'white',
+            position: 'relative'
+          }}
+        >
+          {/* Spotlight glow */}
+          <Box
+            sx={{
+              position: 'absolute',
+              width: 350,
+              height: 350,
+              borderRadius: '50%',
+              background: 'rgba(56,189,248,0.25)',
+              filter: 'blur(120px)',
+              top: '40%',
+              left: '20%',
+              transform: 'translate(-50%, -50%)',
+              zIndex: 1,
+              opacity: 0.9
+            }}
+          />
+
+          <Box sx={{ maxWidth: 520, position: 'relative', zIndex: 2 }}>
+            <Typography
+              variant="h1"
+              sx={{
+                fontWeight: 800,
+                fontSize: '3.2rem',
+                mb: 2
+              }}
+            >
+              <span style={{ background: 'rgba(255,255,255,0.18)', padding: '4px 10px', borderRadius: 8 }}>
+                UrbanSphere
+              </span>{' '}
+              Platform.
+            </Typography>
+
+            <Typography
+              variant="h4"
+              sx={{
+                mb: 3,
+                color: '#38bdf8',
+                fontWeight: 600,
+                fontSize: '1.8rem'
+              }}
+            >
+              Smart city management for the future.
+            </Typography>
+
+            <Typography variant="body1" sx={{ opacity: 0.9, fontSize: '1.15rem', lineHeight: 1.7 }}>
+              AI-powered insights, real-time monitoring, and seamless operations —
+              all in one powerful dashboard.
+            </Typography>
           </Box>
-        </Stack>
-        <Box sx={{ px: 3, my: 3 }}>
-          <AuthFooter />
         </Box>
-      </Stack>
-    </AuthWrapper1>
+      )}
+
+      {/* ---- RIGHT LOGIN CARD ---- */}
+      <Box
+        sx={{
+          width: { xs: '100%', md: '55%' },
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          p: 4,
+          zIndex: 2
+        }}
+      >
+        <Card
+          sx={{
+            width: '100%',
+            maxWidth: 480,  // ⬅ bigger login box
+            bgcolor: 'rgba(255,255,255,0.06)',
+            backdropFilter: 'blur(16px)',
+            p: 5,
+            borderRadius: '24px',
+            boxShadow: '0 0 50px rgba(0,0,0,0.55)'
+          }}
+        >
+          <Stack spacing={3} alignItems="center">
+            <Logo />
+
+            <Box textAlign="center">
+              <Typography variant="h4" sx={{ color: '#38bdf8', fontWeight: 700, fontSize: '1.9rem' }}>
+                Welcome Back
+              </Typography>
+              <Typography variant="body2" sx={{ opacity: 0.75, mt: 0.5 }}>
+                Login to continue managing your smart-city dashboard
+              </Typography>
+            </Box>
+
+            <AuthLogin />
+
+            <Typography
+              component={Link}
+              to="/register"
+              sx={{
+                textDecoration: 'none',
+                color: '#818cf8',
+                fontSize: '1rem',
+                textAlign: 'center'
+              }}
+            >
+              Don&apos;t have an account?
+            </Typography>
+          </Stack>
+        </Card>
+      </Box>
+    </Box>
   );
 }

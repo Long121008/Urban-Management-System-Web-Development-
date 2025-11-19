@@ -39,8 +39,8 @@ export default function ThemeCustomization({ children }) {
       typography: themeTypography,
       colorSchemes: {
         light: {
-          palette: palette.light,
-          customShadows: CustomShadows(palette.light, 'light')
+          palette: palette.dark,
+          customShadows: CustomShadows(palette.dark, 'dark')
         }
       },
       cssVariables: {

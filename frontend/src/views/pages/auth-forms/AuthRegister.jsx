@@ -1,19 +1,21 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 // material-ui
-import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
-import FormControl from '@mui/material/FormControl';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Grid from '@mui/material/Grid';
-import IconButton from '@mui/material/IconButton';
-import InputAdornment from '@mui/material/InputAdornment';
-import InputLabel from '@mui/material/InputLabel';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
+import {
+  Button,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  Grid,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  OutlinedInput,
+  Stack,
+  Typography,
+  Box
+} from '@mui/material';
 
 // project imports
 import AnimateButton from 'ui-component/extended/AnimateButton';
@@ -24,22 +26,29 @@ import { strengthColor, strengthIndicator } from 'utils/password-strength';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
-// ===========================|| JWT - REGISTER ||=========================== //
+// ===========================|| JWT - REGISTER (REAL BACKEND) ||=========================== //
 
 export default function AuthRegister() {
+  const navigate = useNavigate();
+
+  // Form values
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    role: 'citizen' // default user role
+  });
+
   const [showPassword, setShowPassword] = useState(false);
   const [checked, setChecked] = useState(true);
 
+  // Password strength
   const [strength, setStrength] = useState(0);
   const [level, setLevel] = useState();
 
-  const handleClickShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault();
-  };
+  const handleClickShowPassword = () => setShowPassword(!showPassword);
+  const handleMouseDownPassword = (event) => event.preventDefault();
 
   const changePassword = (value) => {
     const temp = strengthIndicator(value);
@@ -48,46 +57,111 @@ export default function AuthRegister() {
   };
 
   useEffect(() => {
-    changePassword('123456');
+    changePassword('');
   }, []);
 
+  // -------------------------------------------------------------
+  // 🔥 SUBMIT REGISTER FORM
+  // -------------------------------------------------------------
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const fullName = `${formData.firstName} ${formData.lastName}`;
+
+    const payload = {
+      fullName,
+      email: formData.email,
+      password: formData.password,
+      role: formData.role
+    };
+
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log('✅ Register success:', data);
+        navigate('/login');
+      } else {
+        console.error('❌ Register failed:', data.message || data.error);
+        alert(data.message || 'Registration failed');
+      }
+    } catch (err) {
+      console.error('⚠️ Error connecting to backend:', err);
+      alert('Error connecting to server');
+    }
+  };
+
   return (
-    <>
+    <form onSubmit={handleSubmit}>
       <Stack sx={{ mb: 2, alignItems: 'center' }}>
-        <Typography variant="subtitle1">Sign up with Email address </Typography>
+        <Typography variant="subtitle1">Sign up with Email address</Typography>
       </Stack>
 
+      {/* ---- Name Fields ---- */}
       <Grid container spacing={{ xs: 0, sm: 2 }}>
         <Grid size={{ xs: 12, sm: 6 }}>
           <CustomFormControl fullWidth>
-            <InputLabel htmlFor="outlined-adornment-first-register">First Name</InputLabel>
-            <OutlinedInput id="outlined-adornment-first-register" type="text" name="firstName" value="Jhones" />
+            <InputLabel htmlFor="first-register">First Name</InputLabel>
+            <OutlinedInput
+              id="first-register"
+              type="text"
+              name="firstName"
+              value={formData.firstName}
+              onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+              required
+            />
           </CustomFormControl>
         </Grid>
+
         <Grid size={{ xs: 12, sm: 6 }}>
           <CustomFormControl fullWidth>
-            <InputLabel htmlFor="outlined-adornment-last-register">Last Name</InputLabel>
-            <OutlinedInput id="outlined-adornment-last-register" type="text" name="lastName" value="Doe" />
+            <InputLabel htmlFor="last-register">Last Name</InputLabel>
+            <OutlinedInput
+              id="last-register"
+              type="text"
+              name="lastName"
+              value={formData.lastName}
+              onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+              required
+            />
           </CustomFormControl>
         </Grid>
       </Grid>
+
+      {/* ---- Email ---- */}
       <CustomFormControl fullWidth>
-        <InputLabel htmlFor="outlined-adornment-email-register">Email Address / Username</InputLabel>
-        <OutlinedInput id="outlined-adornment-email-register" type="email" value="jones@doe.com" name="email" />
+        <InputLabel htmlFor="email-register">Email Address</InputLabel>
+        <OutlinedInput
+          id="email-register"
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          required
+        />
       </CustomFormControl>
 
+      {/* ---- Password ---- */}
       <CustomFormControl fullWidth>
-        <InputLabel htmlFor="outlined-adornment-password-register">Password</InputLabel>
+        <InputLabel htmlFor="password-register">Password</InputLabel>
         <OutlinedInput
-          id="outlined-adornment-password-register"
+          id="password-register"
           type={showPassword ? 'text' : 'password'}
-          value="Jhones@123"
           name="password"
-          label="Password"
+          value={formData.password}
+          onChange={(e) => {
+            setFormData({ ...formData, password: e.target.value });
+            changePassword(e.target.value);
+          }}
           endAdornment={
             <InputAdornment position="end">
               <IconButton
-                aria-label="toggle password visibility"
                 onClick={handleClickShowPassword}
                 onMouseDown={handleMouseDownPassword}
                 edge="end"
@@ -97,9 +171,11 @@ export default function AuthRegister() {
               </IconButton>
             </InputAdornment>
           }
+          required
         />
       </CustomFormControl>
 
+      {/* ---- Password Strength Meter ---- */}
       {strength !== 0 && (
         <FormControl fullWidth>
           <Box sx={{ mb: 2 }}>
@@ -113,18 +189,20 @@ export default function AuthRegister() {
         </FormControl>
       )}
 
+      {/* ---- Terms ---- */}
       <FormControlLabel
-        control={<Checkbox checked={checked} onChange={(event) => setChecked(event.target.checked)} name="checked" color="primary" />}
+        control={<Checkbox checked={checked} onChange={(e) => setChecked(e.target.checked)} color="primary" required />}
         label={
           <Typography variant="subtitle1">
-            Agree with &nbsp;
+            Agree with&nbsp;
             <Typography variant="subtitle1" component={Link} to="#">
-              Terms & Condition.
+              Terms & Conditions.
             </Typography>
           </Typography>
         }
       />
 
+      {/* ---- Submit ---- */}
       <Box sx={{ mt: 2 }}>
         <AnimateButton>
           <Button disableElevation fullWidth size="large" type="submit" variant="contained" color="secondary">
@@ -132,6 +210,6 @@ export default function AuthRegister() {
           </Button>
         </AnimateButton>
       </Box>
-    </>
+    </form>
   );
 }

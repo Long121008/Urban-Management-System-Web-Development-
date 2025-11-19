@@ -17,10 +17,10 @@ function createCustomShadow(palette, baseColor) {
 
     primary: commonShadow(palette.primary.main),
     secondary: commonShadow(palette.secondary.main),
-    orange: commonShadow(palette.orange.main),
-    success: commonShadow(palette.success.main),
-    warning: commonShadow(palette.warning.main),
-    error: commonShadow(palette.error.main)
+    // orange: commonShadow(palette.orange.main),
+    // success: commonShadow(palette.success.main),
+    // warning: commonShadow(palette.warning.main),
+    // error: commonShadow(palette.error.main)
   };
 }
 

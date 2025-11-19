@@ -45,12 +45,12 @@ export default function ReportsPage() {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 3, background: 'linear-gradient(135deg, #23272f 0%, #2c313a 100%)', minHeight: '100vh', color: '#e0e0e0' }}>
       {/* Page Title */}
-      <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
+      <Typography variant="h4" sx={{ fontWeight: 700, mb: 1, color: '#e0e0e0' }}>
         All Reports
       </Typography>
-      <Typography variant="subtitle2" sx={{ color: "#777C6D", mb: 3 }}>
+      <Typography variant="subtitle2" sx={{ color: '#bdbdbd', mb: 3 }}>
         Manage all citizen-submitted issues
       </Typography>
 
@@ -62,19 +62,20 @@ export default function ReportsPage() {
             sx={{
               display: "flex",
               alignItems: "center",
-              backgroundColor: "#FFFFFF",
+              backgroundColor: '#23272f',
               borderRadius: 2,
               px: 2,
               py: 1,
-              border: "1px solid #E0E0E0"
+              border: '1px solid #444'
             }}
           >
-            <SearchIcon sx={{ mr: 1, color: "#777C6D" }} />
+            <SearchIcon sx={{ mr: 1, color: '#bdbdbd' }} />
             <InputBase
               placeholder="Search reports..."
               fullWidth
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              sx={{ color: '#e0e0e0' }}
             />
           </Box>
         </Grid>
@@ -86,9 +87,18 @@ export default function ReportsPage() {
             value={sort}
             onChange={(e) => setSort(e.target.value)}
             sx={{
-              backgroundColor: "#FFFFFF",
+              backgroundColor: '#23272f',
               borderRadius: 2,
-              height: "42px"
+              height: '42px',
+              color: '#e0e0e0'
+            }}
+            MenuProps={{
+              PaperProps: {
+                sx: {
+                  backgroundColor: '#23272f',
+                  color: '#e0e0e0'
+                }
+              }
             }}
           >
             <MenuItem value="newest">Newest</MenuItem>
@@ -104,8 +114,10 @@ export default function ReportsPage() {
         sx={{
           p: 3,
           borderRadius: 3,
-          backgroundColor: "#FFF",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.04)"
+          background: 'linear-gradient(135deg, #23272f 0%, #2c313a 100%)',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
+          color: '#e0e0e0',
+          border: '1px solid #444'
         }}
       >
         {/* Table Header */}
@@ -113,8 +125,8 @@ export default function ReportsPage() {
           container
           sx={{
             fontWeight: 700,
-            color: "#777C6D",
-            borderBottom: "2px solid #E0E0E0",
+            color: '#bdbdbd',
+            borderBottom: '2px solid #444',
             pb: 1,
             mb: 2
           }}
@@ -134,11 +146,11 @@ export default function ReportsPage() {
             key={row.id}
             sx={{
               py: 2,
-              borderBottom: "1px solid #EAEAEA",
-              transition: "0.2s",
-              "&:hover": {
-                backgroundColor: "#F7F7F7",
-                cursor: "pointer"
+              borderBottom: '1px solid #444',
+              transition: '0.2s',
+              '&:hover': {
+                backgroundColor: '#23272f',
+                cursor: 'pointer'
               }
             }}
           >

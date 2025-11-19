@@ -1,19 +1,15 @@
 // project imports
 import { extendPaletteWithChannels } from 'utils/colorUtils';
-
-// assets
 import defaultColor from 'assets/scss/_themes-vars.module.scss';
 
 // ==============================|| DEFAULT THEME - PALETTE ||============================== //
 
 export function buildPalette(presetColor) {
-  let colors;
-  switch (presetColor) {
-    case 'default':
-    default:
-      colors = defaultColor;
-  }
+  let colors = defaultColor;
 
+  // --------------------------
+  // LIGHT PALETTE
+  // --------------------------
   const lightColors = {
     primary: {
       light: colors.primaryLight,
@@ -54,17 +50,12 @@ export function buildPalette(presetColor) {
     grey: {
       50: colors.grey50,
       100: colors.grey100,
+      200: colors.grey200,
+      300: colors.grey300,
       500: colors.grey500,
       600: colors.grey600,
       700: colors.grey700,
       900: colors.grey900
-    },
-    dark: {
-      light: colors.darkTextPrimary,
-      main: colors.darkLevel1,
-      dark: colors.darkLevel2,
-      800: colors.darkBackground,
-      900: colors.darkPaper
     },
     text: {
       primary: colors.grey700,
@@ -80,9 +71,52 @@ export function buildPalette(presetColor) {
     }
   };
 
+  // --------------------------
+  // DARK PALETTE (MATCHING LANDING PAGE)
+  // --------------------------
+  const darkColors = {
+    primary: {
+      light: colors.darkPrimaryLight,
+      main: colors.darkPrimaryMain,
+      dark: colors.darkPrimaryDark,
+      200: colors.darkPrimary200,
+      800: colors.darkPrimary800
+    },
+    secondary: {
+      light: colors.darkSecondaryLight,
+      main: colors.darkSecondaryMain,
+      dark: colors.darkSecondaryDark,
+      200: colors.darkSecondary200,
+      800: colors.darkSecondary800
+    },
+    grey: {
+      50: colors.grey50,
+      100: colors.grey100,
+      200: colors.grey200,
+      300: colors.grey300,
+      500: colors.grey500,
+      600: colors.grey600,
+      700: colors.grey700,
+      900: colors.grey900
+    },
+    text: {
+      primary: colors.darkTextPrimary,
+      secondary: colors.darkTextSecondary,
+      hint: colors.grey300,
+      heading: colors.darkTextTitle
+    },
+    background: {
+      paper: colors.darkPaper,
+      default: colors.darkBackground
+    },
+    divider: colors.darkLevel1
+  };
+
+  // Channels for alpha() support
   const commonColor = { common: { black: colors.darkPaper, white: '#fff' } };
 
   const extendedLight = extendPaletteWithChannels(lightColors);
+  const extendedDark = extendPaletteWithChannels(darkColors);
   const extendedCommon = extendPaletteWithChannels(commonColor);
 
   return {
@@ -90,6 +124,11 @@ export function buildPalette(presetColor) {
       mode: 'light',
       ...extendedCommon,
       ...extendedLight
+    },
+    dark: {
+      mode: 'dark',
+      ...extendedCommon,
+      ...extendedDark
     }
   };
 }

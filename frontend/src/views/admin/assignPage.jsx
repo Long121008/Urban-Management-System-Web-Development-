@@ -1,64 +1,136 @@
-// material-ui
-import { useState } from 'react';
-import Grid from '@mui/material/Grid';
-import Card from '@mui/material/Card';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import InputBase from '@mui/material/InputBase';
-import IconButton from '@mui/material/IconButton';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
-import Pagination from '@mui/material/Pagination';
+// src/pages/AssignCustomerPage.jsx
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import {
+  Box,
+  Grid,
+  Card,
+  Typography,
+  InputBase,
+  IconButton,
+  MenuItem,
+  Select,
+  Pagination,
+  CircularProgress,
+  Button
+} from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import ReportRow from '../../ui-component/admin/ReportRow';
+// import { api } from 'src/api/api';
+import debounce from 'lodash.debounce';
 
 export default function AssignCustomerPage() {
   const [sort, setSort] = useState('newest');
   const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [page, setPage] = useState(1);
+  const [reports, setReports] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
+
+  const limit = 10;
+
+  const loadReports = useCallback(
+    async ({ q = search, s = statusFilter, p = page, so = sort } = {}) => {
+      setLoading(true);
+      try {
+        const params = { page: p, limit, search: q || undefined, status: s || undefined, sort: so || undefined };
+        const data = await api.listReports(params);
+        // expected: { docs: [], totalPages: N, page: p }
+        setReports(data.docs || data || []);
+        setTotalPages(data.totalPages || Math.max(1, Math.ceil((data.total || (data.docs || []).length) / limit)));
+      } catch (err) {
+        console.error('Failed loading reports', err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [search, statusFilter, page, sort]
+  );
+
+  // debounce search
+  const debounced = useMemo(() => debounce((val) => {
+    setPage(1);
+    loadReports({ q: val, p: 1 });
+  }, 400), [loadReports]);
+
+  useEffect(() => {
+    loadReports();
+    return () => debounced.cancel();
+  }, [loadReports, debounced]);
+
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    debounced(e.target.value);
+  };
+
+  const handleAssigned = () => {
+    loadReports(); // refresh after assignment
+  };
 
   return (
-    <Box sx={{ p: 3 }}>
-      {/* Page Title */}
-      <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
-        All Customers
-      </Typography>
-      <Typography variant="subtitle2" sx={{ color: '#777C6D', mb: 3 }}>
-        Active Members
-      </Typography>
+    <Box sx={{ p: 3, background: 'linear-gradient(135deg, #23272f 0%, #2c313a 100%)', minHeight: '100vh', color: '#e0e0e0' }}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <div>
+          <Typography variant="h4" sx={{ fontWeight: 600 }}>All Customers</Typography>
+          <Typography variant="subtitle2" sx={{ color: '#bdbdbd' }}>Active Members</Typography>
+        </div>
+
+        <Box display="flex" gap={2}>
+          <Button variant="outlined" size="small">Export CSV</Button>
+          <Button variant="outlined" size="small">Bulk assign</Button>
+        </Box>
+      </Box>
 
       {/* Top Controls */}
-      <Grid container spacing={2} sx={{ mb: 2 }}>
-        <Grid item xs={12} sm={8} md={4}>
+      <Grid container spacing={2} sx={{ mb: 2, alignItems: 'center' }}>
+        <Grid item xs={12} sm={6} md={5}>
           <Box
             sx={{
               display: 'flex',
               alignItems: 'center',
-              backgroundColor: '#FFFFFF',
+              backgroundColor: '#23272f',
               borderRadius: 2,
               px: 2,
               py: 1,
-              border: '1px solid #E0E0E0'
+              border: '1px solid #444',
+              width: '100%'
             }}
           >
-            <SearchIcon sx={{ mr: 1, color: '#777C6D' }} />
+            <SearchIcon sx={{ mr: 1, color: '#bdbdbd' }} />
             <InputBase
-              placeholder="Search"
+              placeholder="Search by id, location or citizen"
               fullWidth
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={handleSearchChange}
+              sx={{ color: '#e0e0e0' }}
             />
           </Box>
         </Grid>
 
-        <Grid item xs={12} sm={4} md={2} sx={{ ml: 'auto' }}>
+        <Grid item xs={6} sm={3} md={2}>
+          <Select
+            fullWidth
+            value={statusFilter}
+            onChange={(e) => { setStatusFilter(e.target.value); setPage(1); loadReports({ s: e.target.value, p: 1 }); }}
+            displayEmpty
+            sx={{ backgroundColor: '#23272f', borderRadius: 2, height: '42px', color: '#e0e0e0' }}
+            MenuProps={{ PaperProps: { sx: { backgroundColor: '#23272f', color: '#e0e0e0' } } }}
+          >
+            <MenuItem value="">All Status</MenuItem>
+            <MenuItem value="pending">Pending</MenuItem>
+            <MenuItem value="assigned">Assigned</MenuItem>
+            <MenuItem value="resolved">Resolved</MenuItem>
+            <MenuItem value="critical">Critical</MenuItem>
+          </Select>
+        </Grid>
+
+        <Grid item xs={6} sm={3} md={2}>
           <Select
             fullWidth
             value={sort}
-            onChange={(e) => setSort(e.target.value)}
-            sx={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: 2,
-              height: '42px'
-            }}
+            onChange={(e) => { setSort(e.target.value); loadReports({ so: e.target.value }); }}
+            sx={{ backgroundColor: '#23272f', borderRadius: 2, height: '42px', color: '#e0e0e0' }}
+            MenuProps={{ PaperProps: { sx: { backgroundColor: '#23272f', color: '#e0e0e0' } } }}
           >
             <MenuItem value="newest">Newest</MenuItem>
             <MenuItem value="oldest">Oldest</MenuItem>
@@ -67,55 +139,53 @@ export default function AssignCustomerPage() {
       </Grid>
 
       {/* Table Wrapper */}
-      <Card
-        sx={{
-          p: 3,
-          borderRadius: 3,
-          backgroundColor: '#F7F7F7',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.04)'
-        }}
-      >
+      <Card sx={{
+        p: 0,
+        borderRadius: 3,
+        background: 'linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.01) 100%)',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
+        color: '#e0e0e0',
+        border: '1px solid rgba(255,255,255,0.03)'
+      }}>
         {/* Header Row */}
-        <Grid container sx={{ fontWeight: 600, color: '#777C6D', mb: 2, justifyContent: "space-around" }}>
-          <Grid item xs={2}>Report ID</Grid>
+        <Grid container sx={{ px: 3, py: 2, fontWeight: 700, color: '#bdbdbd', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+          <Grid item xs={1.2}>ID</Grid>
           <Grid item xs={2}>Category</Grid>
-          <Grid item xs={2}>Location</Grid>
+          <Grid item xs={2.2}>Location</Grid>
           <Grid item xs={2}>Citizen</Grid>
-          <Grid item xs={2}>Status</Grid>
-          <Grid item xs={2}>Engineer Assigned</Grid>
+          <Grid item xs={1.6}>Status</Grid>
+          <Grid item xs={2}>Engineer</Grid>
+          <Grid item xs={0.8} />
         </Grid>
 
-        {/* Example Row */}
-        <Grid container sx={{ py: 2, borderBottom: '1px solid #E0E0E0', justifyContent: "space-around" }}>
-          <Grid item xs={2}>1</Grid>
-          <Grid item xs={2}>Ổ gà</Grid>
-          <Grid item xs={2}>361 Ngô Quyền</Grid>
-          <Grid item xs={2}>LocNg</Grid>
-          <Grid item xs={2}>Pending</Grid>
-          <Grid item xs={2}>Mr Gold</Grid>
-        </Grid>
-
-        <Grid container sx={{ py: 2, borderBottom: '1px solid #E0E0E0', justifyContent: "space-around" }}>
-          <Grid item xs={2}>2</Grid>
-          <Grid item xs={2}>Ổ chuot</Grid>
-          <Grid item xs={2}>361 Ngô Quyền</Grid>
-          <Grid item xs={2}>LocNg</Grid>
-          <Grid item xs={2}>Pending</Grid>
-          <Grid item xs={2}>Mr Gold</Grid>
-        </Grid>
-
-        <Grid container sx={{ py: 2, borderBottom: '1px solid #E0E0E0', justifyContent: "space-around" }}>
-          <Grid item xs={2}>3</Grid>
-          <Grid item xs={2}>Ổ gà</Grid>
-          <Grid item xs={2}>361 Ngô Quyền</Grid>
-          <Grid item xs={2}>LocNg</Grid>
-          <Grid item xs={2}>Pending</Grid>
-          <Grid item xs={2}>Mr Gold</Grid>
-        </Grid>
+        {/* Content */}
+        {loading ? (
+          <Box display="flex" justifyContent="center" p={6}><CircularProgress /></Box>
+        ) : (
+          <>
+            {reports.length === 0 ? (
+              <Box p={6} textAlign="center">No reports found</Box>
+            ) : (
+              <Box>
+                {reports.map((r) => (
+                  <Box key={r.id || r._id}>
+                    <ReportRow report={r} onAssigned={handleAssigned} />
+                  </Box>
+                ))}
+              </Box>
+            )}
+          </>
+        )}
 
         {/* Pagination */}
-        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
-          <Pagination count={40} variant="outlined" shape="rounded" />
+        <Box sx={{ px: 3, py: 2, display: 'flex', justifyContent: 'flex-end' }}>
+          <Pagination
+            count={totalPages}
+            page={page}
+            onChange={(e, v) => { setPage(v); loadReports({ p: v }); }}
+            variant="outlined"
+            shape="rounded"
+          />
         </Box>
       </Card>
     </Box>

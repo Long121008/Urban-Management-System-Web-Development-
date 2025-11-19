@@ -17,7 +17,7 @@ export default function Navbar() {
       </div>
 
        <div className="nav__right">
-        <Link to="/pages/login" className="nav__cta">
+        <Link to="/login" className="nav__cta">
           Sign In
         </Link>
       </div>

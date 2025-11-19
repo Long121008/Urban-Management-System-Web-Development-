@@ -32,9 +32,10 @@ export default function ReportsOverTimeChart() {
     <Card
       sx={{
         height: '100%',
+        background: 'linear-gradient(135deg, #23272f 0%, #2c313a 100%)',
         boxShadow: 2,
         borderRadius: 2,
-        backgroundColor: '#FAFAFA'
+        color: '#e0e0e0'
       }}
     >
       <CardContent>
@@ -48,19 +49,19 @@ export default function ReportsOverTimeChart() {
               data={data}
               margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
             >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-              <YAxis tick={{ fontSize: 12 }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+              <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#e0e0e0' }} />
+              <YAxis tick={{ fontSize: 12, fill: '#e0e0e0' }} />
               <Tooltip
                 formatter={(value) => [`${value} báo cáo`, 'Số lượng']}
-                contentStyle={{ backgroundColor: '#fff', borderRadius: '8px' }}
+                contentStyle={{ backgroundColor: '#23272f', color: '#e0e0e0', borderRadius: '8px' }}
               />
-              <Legend verticalAlign="bottom" height={36} />
+              <Legend verticalAlign="bottom" height={36} wrapperStyle={{ color: '#e0e0e0' }} />
               <Line
                 type="monotone"
                 dataKey="reports"
                 name="Số báo cáo"
-                stroke="#1976D2"
+                stroke="#90caf9"
                 strokeWidth={3}
                 activeDot={{ r: 6 }}
               />

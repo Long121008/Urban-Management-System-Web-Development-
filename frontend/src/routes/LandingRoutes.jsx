@@ -7,7 +7,7 @@ const LandingPage = Loadable(lazy(() => import('views/landing/LandingPage')));
 
 
 const LandingRoutes = {
-  path: '/landing_page/',
+  path: '/',
   element: (
         <LandingPage />
     )

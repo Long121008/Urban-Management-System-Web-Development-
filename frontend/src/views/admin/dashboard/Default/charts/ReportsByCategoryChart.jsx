@@ -25,9 +25,10 @@ export default function ReportsByCategoryChart() {
     <Card
       sx={{
         height: '100%',
+        background: 'linear-gradient(135deg, #23272f 0%, #2c313a 100%)',
         boxShadow: 2,
         borderRadius: 2,
-        backgroundColor: '#FAFAFA'
+        color: '#e0e0e0'
       }}
     >
       <CardContent>
@@ -55,9 +56,9 @@ export default function ReportsByCategoryChart() {
               </Pie>
               <Tooltip
                 formatter={(value) => `${value}%`}
-                contentStyle={{ backgroundColor: '#fff', borderRadius: '8px' }}
+                contentStyle={{ backgroundColor: '#23272f', color: '#e0e0e0', borderRadius: '8px' }}
               />
-              <Legend verticalAlign="bottom" height={36} />
+              <Legend verticalAlign="bottom" height={36} wrapperStyle={{ color: '#e0e0e0' }} />
             </PieChart>
           </ResponsiveContainer>
         </Box>

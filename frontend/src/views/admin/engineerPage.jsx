@@ -41,12 +41,12 @@ export default function EngineersPage() {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 3, background: 'linear-gradient(135deg, #23272f 0%, #2c313a 100%)', minHeight: '100vh', color: '#e0e0e0' }}>
       {/* Title */}
-      <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
+      <Typography variant="h4" sx={{ fontWeight: 700, mb: 1, color: '#e0e0e0' }}>
         Engineers
       </Typography>
-      <Typography variant="subtitle2" sx={{ color: "#777C6D", mb: 3 }}>
+      <Typography variant="subtitle2" sx={{ color: '#bdbdbd', mb: 3 }}>
         Manage engineers and workloads
       </Typography>
 
@@ -57,19 +57,20 @@ export default function EngineersPage() {
             sx={{
               display: "flex",
               alignItems: "center",
-              backgroundColor: "#FFFFFF",
+              backgroundColor: '#23272f',
               borderRadius: 2,
               px: 2,
               py: 1,
-              border: "1px solid #E0E0E0"
+              border: '1px solid #444'
             }}
           >
-            <SearchIcon sx={{ mr: 1, color: "#777C6D" }} />
+            <SearchIcon sx={{ mr: 1, color: '#bdbdbd' }} />
             <InputBase
               placeholder="Search engineer..."
               fullWidth
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              sx={{ color: '#e0e0e0' }}
             />
           </Box>
         </Grid>
@@ -82,9 +83,9 @@ export default function EngineersPage() {
       </Grid>
 
       {/* Table */}
-      <Card sx={{ p: 3, borderRadius: 3 }}>
+      <Card sx={{ p: 3, borderRadius: 3, background: 'linear-gradient(135deg, #23272f 0%, #2c313a 100%)', color: '#e0e0e0', boxShadow: '0 4px 20px rgba(0,0,0,0.12)', border: '1px solid #444' }}>
         {/* Header */}
-        <Grid container sx={{ fontWeight: 700, color: "#777C6D", pb: 1, borderBottom: "2px solid #E0E0E0" }}>
+        <Grid container sx={{ fontWeight: 700, color: '#bdbdbd', pb: 1, borderBottom: '2px solid #444' }}>
           <Grid item xs={3}>Name</Grid>
           <Grid item xs={3}>Email</Grid>
           <Grid item xs={2}>Status</Grid>
@@ -99,8 +100,8 @@ export default function EngineersPage() {
             container
             sx={{
               py: 2,
-              borderBottom: "1px solid #EEE",
-              "&:hover": { backgroundColor: "#F7F7F7", cursor: "pointer" }
+              borderBottom: '1px solid #444',
+              '&:hover': { backgroundColor: '#23272f', cursor: 'pointer' }
             }}
           >
             <Grid item xs={3}>{eng.name}</Grid>

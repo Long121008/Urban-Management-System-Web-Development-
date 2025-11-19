@@ -68,7 +68,7 @@ export default function AuthLogin() {
 
         if (user.role === 'authority') navigate('/admin/dashboard');
         else if (user.role === 'technician') navigate('/engineer/dashboard');
-        else navigate('/user');
+        else navigate('/user/home');
 
       } else {
         console.error('❌ Login failed:', data.message || data.error);
