@@ -58,7 +58,7 @@ export default function ReportRow({ report, onAssigned }) {
 
         <Grid item xs={2}>
               <Typography variant="body2" noWrap>
-                {report.assigned_team_id ? report.assigned_team_id._id : "Unassigned"}
+                {report.assigned_engineer_id ? report.assigned_engineer_id._id : "Unassigned"}
               </Typography>
             </Grid>
 

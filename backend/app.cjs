@@ -31,6 +31,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // ADMIN
 app.use('/api/admin/assign', require('./routes/admin/assignRoutes'));
 app.use('/api/admin/engineer', require('./routes/admin/adminEngineerRoutes'));
+app.use('/api/admin/reports', require('./routes/admin/adminAllReports'));
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

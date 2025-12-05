@@ -11,11 +11,24 @@ import {
   Select,
   Pagination,
   CircularProgress,
-  Button
+  Button,
+  Paper,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  TableContainer
 } from '@mui/material';
+
 import SearchIcon from '@mui/icons-material/Search';
 import ReportRow from '../../ui-component/admin/ReportRow';
 import debounce from 'lodash.debounce';
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import { Collapse } from "@mui/material";
+import { apiGet, apiPost } from '../../utils/api';
+
 
 export default function AssignCustomerPage() {
   const [sort, setSort] = useState('newest');
@@ -25,6 +38,10 @@ export default function AssignCustomerPage() {
   const [reports, setReports] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
+
+  const [openRow, setOpenRow] = useState(null);
+  const [selectedEngineer, setSelectedEngineer] = useState("");
+  const engineers = ["John Doe", "Emily Tran", "Robert Lee"];
 
   const limit = 10;
 
@@ -40,12 +57,11 @@ export default function AssignCustomerPage() {
           sort: so || ''
         });
 
-        const response = await fetch(`http://localhost:5000/api/admin/assign?${params}`);
-        const data = await response.json();
+        const response = await apiGet(`/api/admin/assign`, params);
 
-        if (response.ok) {
-          setReports(data.data || []);
-          setTotalPages(data.totalPages || 1);
+        if (response.success) {
+          setReports(response.data || []);
+          setTotalPages(response.totalPages || 1);
         } else {
           console.error('Failed to fetch reports:', data.message);
         }
@@ -158,36 +174,121 @@ export default function AssignCustomerPage() {
         color: '#e0e0e0',
         border: '1px solid rgba(255,255,255,0.03)'
       }}>
-        {/* Header Row */}
-        <Grid container sx={{ px: 3, py: 2, fontWeight: 700, color: '#bdbdbd', borderBottom: '1px solid rgba(255,255,255,0.03)', justifyContent: "space-around" }}>
-          <Grid item xs={1.2}>ID</Grid>
-          <Grid item xs={2}>Category</Grid>
-          <Grid item xs={2.2}>Location</Grid>
-          <Grid item xs={2}>Citizen</Grid>
-          <Grid item xs={1.6}>Status</Grid>
-          <Grid item xs={2}>Engineer</Grid>
-          <Grid item xs={0.8} />
-        </Grid>
+        <TableContainer sx={{ maxHeight: 580 }}>
+  <Table stickyHeader>
 
-        {/* Content */}
-        {loading ? (
-          <Box display="flex" justifyContent="center" p={6}><CircularProgress /></Box>
-        ) : (
-          <>
-            {reports.length === 0 ? (
-              <Box p={6} textAlign="center">No reports found</Box>
-            ) : (
-              <Box>
-                {reports.map((r) => (
-                  <Box key={r.id || r._id}>
-                    <ReportRow report={r} onAssigned={handleAssigned} />
-                  </Box>
+    <TableHead>
+      <TableRow sx={{ backgroundColor: 'white' }}>
+        <TableCell sx={{ color: 'white', minWidth: 80 }}>ID</TableCell>
+        <TableCell sx={{ color: '#bdbdbd', minWidth: 120 }}>Category</TableCell>
+        <TableCell sx={{ color: '#bdbdbd', minWidth: 160 }}>Location</TableCell>
+        <TableCell sx={{ color: '#bdbdbd', minWidth: 140 }}>Citizen</TableCell>
+        <TableCell sx={{ color: '#bdbdbd', minWidth: 120 }}>Status</TableCell>
+        <TableCell sx={{ color: '#bdbdbd', minWidth: 140 }}>Engineer</TableCell>
+        <TableCell sx={{ color: '#bdbdbd', minWidth: 80 }} />
+      </TableRow>
+    </TableHead>
+
+    <TableBody>
+
+      {loading ? (
+        <TableRow>
+          <TableCell colSpan={7} align="center">
+            <CircularProgress />
+          </TableCell>
+        </TableRow>
+      ) : reports.length === 0 ? (
+        <TableRow>
+          <TableCell colSpan={7} align="center" sx={{ py: 4 }}>
+            No reports found
+          </TableCell>
+        </TableRow>
+      ) : (
+       reports.map((r) => (
+  <React.Fragment key={r._id || r.id}>
+
+    {/* Main Row */}
+    <TableRow
+      hover
+      sx={{ cursor: "pointer" }}
+      onClick={() => setOpenRow(openRow === r._id ? null : r._id)}
+    >
+      <TableCell>
+        {openRow === r._id ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+      </TableCell>
+
+      <TableCell>{r._id}</TableCell>
+      <TableCell>{r.type || "N/A"}</TableCell>
+      <TableCell>
+        {r.location?.coordinates
+          ? `${r.location.coordinates[1]}, ${r.location.coordinates[0]}`
+          : "N/A"}
+      </TableCell>
+      <TableCell>{r.citizen || "N/A"}</TableCell>
+      <TableCell>{r.status}</TableCell>
+      <TableCell>{r.engineer || "Unassigned"}</TableCell>
+    </TableRow>
+
+    {/* Expanded Row */}
+    <TableRow>
+      <TableCell
+        colSpan={8}
+        sx={{ py: 0, border: 0, backgroundColor: "rgba(255,255,255,0.02)" }}
+      >
+        <Collapse in={openRow === r._id} timeout="auto" unmountOnExit>
+          <Box sx={{ p: 2 }}>
+
+            <Typography sx={{ fontWeight: 600, mb: 1 }}>
+              Problem Details
+            </Typography>
+            <Box sx={{ ml: 1, mb: 2, color: "#ccc" }}>
+              <p><b>Title:</b> {r.title}</p>
+              <p><b>Description:</b> {r.description || "No description"}</p>
+              <p><b>Address:</b> {r.address}</p>
+            </Box>
+
+            <Typography sx={{ fontWeight: 600, mb: 1 }}>
+              Assign Engineer
+            </Typography>
+
+            <Box sx={{ display: "flex", gap: 2 }}>
+              <Select
+                size="small"
+                value={selectedEngineer}
+                onChange={(e) => setSelectedEngineer(e.target.value)}
+                sx={{ width: 200, background: "#23272f", color: "white" }}
+              >
+                {engineers.map((eng) => (
+                  <MenuItem value={eng} key={eng}>{eng}</MenuItem>
                 ))}
-              </Box>
-            )}
-          </>
-        )}
+              </Select>
 
+              <Button
+                variant="contained"
+                size="small"
+                onClick={() => {
+                  console.log("Assign engineer:", selectedEngineer);
+                  handleAssigned();
+                }}
+              >
+                Assign
+              </Button>
+            </Box>
+
+          </Box>
+        </Collapse>
+      </TableCell>
+    </TableRow>
+
+  </React.Fragment>
+))
+
+      )}
+
+    </TableBody>
+
+  </Table>
+</TableContainer>
         {/* Pagination */}
         <Box sx={{ px: 3, py: 2, display: 'flex', justifyContent: 'flex-end' }}>
           <Pagination

@@ -7,6 +7,12 @@ import {
   InputBase,
   Button,
   Chip,
+  TableContainer,
+  TableHead,
+  TableCell,
+  Table,
+  TableBody,
+  TableRow,
   Pagination
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
@@ -83,43 +89,48 @@ export default function EngineersPage() {
       </Grid>
 
       {/* Table */}
-      <Card sx={{ p: 3, borderRadius: 3, background: 'linear-gradient(135deg, #23272f 0%, #2c313a 100%)', color: '#e0e0e0', boxShadow: '0 4px 20px rgba(0,0,0,0.12)', border: '1px solid #444' }}>
-        {/* Header */}
-        <Grid container sx={{ fontWeight: 700, color: '#bdbdbd', pb: 1, borderBottom: '2px solid #444', justifyContent: "space-around" }}>
-          <Grid item xs={3}>Name</Grid>
-          <Grid item xs={3}>Email</Grid>
-          <Grid item xs={2}>Status</Grid>
-          <Grid item xs={2}>Active Tasks</Grid>
-          <Grid item xs={2}>Action</Grid>
-        </Grid>
+      <Card sx={{ p: 0, borderRadius: 3, background: 'linear-gradient(135deg, #23272f 0%, #2c313a 100%)', color: '#e0e0e0', boxShadow: '0 4px 20px rgba(0,0,0,0.12)', border: '1px solid #444' }}>
+  <TableContainer sx={{ maxHeight: 500 }}>
+    <Table stickyHeader>
+      
+      {/* Header */}
+      <TableHead>
+        <TableRow sx={{ backgroundColor: '#1f2229' }}>
+          <TableCell sx={{ color: '#bdbdbd', fontWeight: 700 }}>Name</TableCell>
+          <TableCell sx={{ color: '#bdbdbd', fontWeight: 700 }}>Email</TableCell>
+          <TableCell sx={{ color: '#bdbdbd', fontWeight: 700 }}>Status</TableCell>
+          <TableCell sx={{ color: '#bdbdbd', fontWeight: 700 }}>Active Tasks</TableCell>
+          <TableCell sx={{ color: '#bdbdbd', fontWeight: 700 }}>Action</TableCell>
+        </TableRow>
+      </TableHead>
 
-        {/* Rows */}
+      {/* Rows */}
+      <TableBody>
         {engineers.map((eng, idx) => (
-          <Grid
+          <TableRow
             key={idx}
-            container
-            sx={{
-              py: 2,
-              borderBottom: '1px solid #444',
-              '&:hover': { backgroundColor: '#23272f', cursor: 'pointer' },
-              justifyContent: "space-around"
-            }}
+            hover
+            sx={{ '&:hover': { backgroundColor: '#282c34' } }}
           >
-            <Grid item xs={3}>{eng.name}</Grid>
-            <Grid item xs={3}>{eng.email}</Grid>
-            <Grid item xs={2}>{getStatusChip(eng.status)}</Grid>
-            <Grid item xs={2}>{eng.tasks}</Grid>
-            <Grid item xs={2}>
+            <TableCell>{eng.name}</TableCell>
+            <TableCell>{eng.email}</TableCell>
+            <TableCell>{getStatusChip(eng.status)}</TableCell>
+            <TableCell>{eng.tasks}</TableCell>
+            <TableCell>
               <Button size="small" variant="outlined">View</Button>
-            </Grid>
-          </Grid>
+            </TableCell>
+          </TableRow>
         ))}
+      </TableBody>
 
-        {/* Pagination */}
-        <Box sx={{ mt: 3, display: "flex", justifyContent: "center" }}>
-          <Pagination count={5} variant="outlined" shape="rounded" />
-        </Box>
-      </Card>
+    </Table>
+  </TableContainer>
+
+  {/* Pagination */}
+  <Box sx={{ mt: 3, display: "flex", justifyContent: "center", py: 2 }}>
+    <Pagination count={5} variant="outlined" shape="rounded" />
+  </Box>
+</Card>
     </Box>
   );
 }

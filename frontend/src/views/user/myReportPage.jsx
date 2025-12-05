@@ -1,18 +1,22 @@
 import React, { useState, useEffect } from "react";
-import Grid from "@mui/material/Grid";
 import {
-  Box,
-  Card,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TablePagination,
+  TableRow,
   Typography,
   Chip,
-  Button,
-  Pagination,
   CircularProgress,
+  Box,
   Alert,
 } from "@mui/material";
-import { gridSpacing } from "store/constant";
 import axios from "axios";
-
+import { apiGet, apiPost } from "../../utils/api";
+// Status chip renderer
 const StatusChip = (status) => {
   const colors = {
     reported: { label: "Mới báo cáo", color: "default" },
@@ -25,106 +29,138 @@ const StatusChip = (status) => {
   return <Chip label={c.label} color={c.color} size="small" />;
 };
 
-const MyReportsPage = () => {
-  const [isLoading, setLoading] = useState(true);
+// -------- TABLE COLUMN DEFINITION ----------
+const columns = [
+  { id: "title", label: "Tiêu đề", minWidth: 150 },
+  { id: "category", label: "Loại", minWidth: 100 },
+  { id: "address", label: "Địa điểm", minWidth: 200 },
+  { id: "created_at", label: "Ngày tạo", minWidth: 100 },
+  { id: "status", label: "Trạng thái", minWidth: 100 },
+];
+
+export default function MyReportsPage() {
   const [reports, setReports] = useState([]);
+  const [isLoading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // pagination states
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   useEffect(() => {
     const fetchFromDB = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/incidents/public");
-        if (res.data.success) {
-          setReports(res.data.data);
+        const res = await apiGet("/api/incidents/public");
+
+        if (res.success) {
+          setReports(res.data);
         } else {
           setError("API trả về success: false");
         }
-      } catch (error) {
-        console.error("Lỗi lấy dữ liệu:", error);
-        setError("Không kết nối được server (Lỗi mạng/CORS)");
+      } catch (err) {
+        setError("Không kết nối được server.");
       } finally {
         setLoading(false);
       }
     };
+
     fetchFromDB();
   }, []);
 
-  if (isLoading) {
+  // Change page
+  const handleChangePage = (_, newPage) => {
+    setPage(newPage);
+  };
+
+  // Change rows per page
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
+
+  // Loading state
+  if (isLoading)
     return (
-      <Box sx={{ p: 5, textAlign: "center" }}>
+      <Box sx={{ textAlign: "center", p: 5 }}>
         <CircularProgress />
       </Box>
     );
-  }
 
   return (
-    <Grid container spacing={gridSpacing} direction="column">
-      <Grid item xs={12}>
-        <Typography variant="h4" sx={{ fontWeight: 700 }}>
-          Danh Sách Sự Cố
-        </Typography>
-        {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
-        <Typography variant="subtitle2" sx={{ color: "#777C6D", mb: 2 }}>
-          Tổng số báo cáo: {reports.length}
-        </Typography>
-      </Grid>
+    <>
+      <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
+        Danh Sách Sự Cố
+      </Typography>
+      <Typography variant="subtitle2" sx={{ color: "#777C6D", mb: 2 }}>
+        Tổng số báo cáo: {reports.length}
+      </Typography>
 
-      <Grid item xs={12}>
-        <Card
-          sx={{
-            p: 3,
-            borderRadius: 3,
-            boxShadow: "0 4px 20px rgba(0,0,0,0.04)",
-          }}
-        >
-          <Grid container sx={{ fontWeight: 700, justifyContent: "space-around" }}>
-            <Grid item xs={3}>Tiêu đề</Grid>
-            <Grid item xs={2}>Loại</Grid>
-            <Grid item xs={3}>Địa điểm</Grid>
-            <Grid item xs={2}>Ngày tạo</Grid>
-            <Grid item xs={2}>Trạng thái</Grid>
-          </Grid>
+      {error && <Alert severity="error">{error}</Alert>}
 
-          {reports.length === 0 ? (
-            <Typography sx={{ p: 3, textAlign: "center" }}>
-              Chưa có dữ liệu nào trong DB.
-            </Typography>
-          ) : (
-            reports.map((r) => (
-              <Grid
-                key={r._id}
-                container
-                sx={{
-                  py: 2,
-                  borderBottom: "1px solid #EEE",
-                  alignItems: "center",
-                  justifyContent: "space-around",
-                }}
-              >
-                <Grid item xs={3}>
-                  <Typography variant="subtitle2" noWrap title={r.title}>
-                    {r.title}
-                  </Typography>
-                </Grid>
-                <Grid item xs={2}>{r.type_id?.name || "Khác"}</Grid>
-                <Grid item xs={3}>
-                  <Typography variant="body2" noWrap title={r.address}>
-                    {r.address}
-                  </Typography>
-                </Grid>
-                <Grid item xs={2}>
-                  {r.created_at
-                    ? new Date(r.created_at).toLocaleDateString("vi-VN")
-                    : "N/A"}
-                </Grid>
-                <Grid item xs={2}>{StatusChip(r.status)}</Grid>
-              </Grid>
-            ))
-          )}
-        </Card>
-      </Grid>
-    </Grid>
+      {/* ---------- TABLE ---------- */}
+      <Paper sx={{ width: "100%", overflow: "hidden", borderRadius: 3 }}>
+        <TableContainer sx={{ maxHeight: 550 }}>
+          <Table stickyHeader aria-label="incident table">
+
+            {/* TABLE HEADER */}
+            <TableHead>
+              <TableRow>
+  {columns.map((col) => (
+                <TableCell
+                  key={col.id}
+                  sx={{ 
+                    minWidth: col.minWidth,
+                    color: "white",        // <-- header text color
+                    fontWeight: "700"      // bold
+                  }}
+                >
+                  {col.label}
+                </TableCell>
+              ))}
+            </TableRow>
+            </TableHead>
+
+            {/* TABLE ROWS */}
+            <TableBody>
+              {reports
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((r) => (
+                  <TableRow hover key={r._id}>
+
+                    <TableCell>{r.title}</TableCell>
+                    <TableCell>{r.type_id?.name || "Khác"}</TableCell>
+
+                    <TableCell>
+                      <Typography noWrap title={r.address}>
+                        {r.address}
+                      </Typography>
+                    </TableCell>
+
+                    <TableCell>
+                      {r.created_at
+                        ? new Date(r.created_at).toLocaleDateString("vi-VN")
+                        : "N/A"}
+                    </TableCell>
+
+                    <TableCell>{StatusChip(r.status)}</TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+        {/* PAGINATION */}
+        <TablePagination
+          rowsPerPageOptions={[10, 25, 50]}
+          component="div"
+          count={reports.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          labelRowsPerPage="Số dòng mỗi trang:"
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </Paper>
+    </>
   );
-};
-
-export default MyReportsPage;
+}

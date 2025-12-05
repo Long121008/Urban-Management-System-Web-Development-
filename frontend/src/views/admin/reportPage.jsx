@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Grid,
@@ -8,20 +8,56 @@ import {
   Select,
   MenuItem,
   Pagination,
+  TableContainer,
+  Table,
+  TableRow,
+  TableCell,
+  TableHead,
+  TableBody,
   Chip
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-
+import { apiGet, apiPost } from "../../utils/api";
 export default function ReportsPage() {
   const [sort, setSort] = useState("newest");
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [reports, setReports] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [totalPages, setTotalPages] = useState(1); 
 
-  // Dummy data (replace with API data)
-  const reports = [
-    { id: 1, category: "Pothole", location: "361 Ngo Quyen", citizen: "LocNg", status: "Pending", engineer: "Mr Gold" },
-    { id: 2, category: "Trash", location: "200 Tran Phu", citizen: "Minh", status: "Assigned", engineer: "Ms Hoa" },
-    { id: 3, category: "Broken Light", location: "544 Hai Ba Trung", citizen: "An", status: "Completed", engineer: "Mr Binh" }
-  ];
+  const limit = 10;
+
+  const fetchReports = async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({
+        page,
+        limit,
+        search: search || "",
+        sort: sort || "",
+      });
+
+      const response = await apiGet("/api/admin/reports", params);
+    
+      if (response.success) {
+        console.log("I am here")
+        setReports(response.data || []);
+        setTotalPages(response.totalPages || 1);
+      } else {
+        console.error("Failed to fetch reports:", data.message);
+      }
+    } catch (err) {
+      console.error("Error fetching reports:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch reports when the component mounts or when dependencies change
+  useEffect(() => {
+    fetchReports();
+  }, [page, sort, search]);
 
   const getStatusChip = (status) => {
     const colors = {
@@ -111,64 +147,62 @@ export default function ReportsPage() {
 
       {/* Table Container */}
       <Card
-        sx={{
-          p: 3,
-          borderRadius: 3,
-          background: 'linear-gradient(135deg, #23272f 0%, #2c313a 100%)',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
-          color: '#e0e0e0',
-          border: '1px solid #444'
-        }}
-      >
-        {/* Table Header */}
-        <Grid
-          container
-          sx={{
-            fontWeight: 700,
-            color: '#bdbdbd',
-            borderBottom: '2px solid #444',
-            pb: 1,
-            mb: 2,
-            justifyContent: "space-around"
-          }}
-        >
-          <Grid item xs={2}>Report ID</Grid>
-          <Grid item xs={2}>Category</Grid>
-          <Grid item xs={3}>Location</Grid>
-          <Grid item xs={2}>Citizen</Grid>
-          <Grid item xs={2}>Status</Grid>
-          <Grid item xs={1}>Engineer</Grid>
-        </Grid>
+  sx={{
+    p: 0,
+    borderRadius: 3,
+    background: 'linear-gradient(135deg, #23272f 0%, #2c313a 100%)',
+    boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
+    color: '#e0e0e0',
+    border: '1px solid #444'
+  }}
+>
+  <TableContainer sx={{ maxHeight: 500 }}>
+    <Table stickyHeader>
 
-        {/* Table Rows */}
+      {/* Header */}
+      <TableHead>
+        <TableRow sx={{ backgroundColor: '#1f2229' }}>
+          <TableCell sx={{ color: '#bdbdbd', fontWeight: 700 }}>Report ID</TableCell>
+          <TableCell sx={{ color: '#bdbdbd', fontWeight: 700 }}>Category</TableCell>
+          <TableCell sx={{ color: '#bdbdbd', fontWeight: 700 }}>Location</TableCell>
+          <TableCell sx={{ color: '#bdbdbd', fontWeight: 700 }}>Citizen</TableCell>
+          <TableCell sx={{ color: '#bdbdbd', fontWeight: 700 }}>Status</TableCell>
+          <TableCell sx={{ color: '#bdbdbd', fontWeight: 700 }}>Engineer</TableCell>
+        </TableRow>
+      </TableHead>
+
+      {/* Rows */}
+      <TableBody>
         {reports.map((row) => (
-          <Grid
-            container
+          <TableRow
             key={row.id}
+            hover
             sx={{
-              py: 2,
-              borderBottom: '1px solid #444',
-              transition: '0.2s',
-              '&:hover': {
-                backgroundColor: '#23272f',
-                cursor: 'pointer'
-              },justifyContent: "space-around"
+              '&:hover': { backgroundColor: '#282c34', cursor: 'pointer' }
             }}
           >
-            <Grid item xs={2}>{row.id}</Grid>
-            <Grid item xs={2}>{row.category}</Grid>
-            <Grid item xs={3}>{row.location}</Grid>
-            <Grid item xs={2}>{row.citizen}</Grid>
-            <Grid item xs={2}>{getStatusChip(row.status)}</Grid>
-            <Grid item xs={1}>{row.engineer}</Grid>
-          </Grid>
+            <TableCell>{row.id}</TableCell>
+            <TableCell>{row.category}</TableCell>
+            <TableCell>
+                    {row.location?.coordinates
+                      ? `${row.location.coordinates[1]}, ${row.location.coordinates[0]}`
+                      : "N/A"}
+                  </TableCell>
+            <TableCell>{row.citizen}</TableCell>
+            <TableCell>{getStatusChip(row.status)}</TableCell>
+            <TableCell>{row.engineer}</TableCell>
+          </TableRow>
         ))}
+      </TableBody>
 
-        {/* Pagination */}
-        <Box sx={{ mt: 3, display: "flex", justifyContent: "center" }}>
-          <Pagination count={10} variant="outlined" shape="rounded" />
-        </Box>
-      </Card>
+    </Table>
+  </TableContainer>
+
+  {/* Pagination */}
+  <Box sx={{ mt: 3, display: "flex", justifyContent: "center", py: 2 }}>
+    <Pagination count={10} variant="outlined" shape="rounded" />
+  </Box>
+</Card>
     </Box>
   );
 }

@@ -16,7 +16,7 @@ exports.getEngineers = async (req, res) => {
     const engineerData = await Promise.all(
       engineers.map(async (engineer) => {
         const activeTasks = await Incident.countDocuments({
-          assigned_team_id: engineer._id,
+          assigned_engineer_id: engineer._id,
           status: { $in: ['in_progress', 'assigned'] }, // Active tasks
         });
 
