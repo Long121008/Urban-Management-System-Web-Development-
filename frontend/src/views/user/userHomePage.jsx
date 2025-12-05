@@ -1,43 +1,102 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Grid,
   Card,
   Typography,
-  Button,
   Avatar,
+  CircularProgress
 } from "@mui/material";
+import axios from "axios";
 
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import RecentReportsCard from "./card/RecentReportsCard";
 import UserIntroCard from "./card/UserIntroCard";
 import UserProfileCard from "./card/UserProfileCard";
 
 export default function UserHomePage() {
+  const [reports, setReports] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const sampleReports = [
-    { id: 101, category: "Ổ Gà", location: "500 Ngô Quyền", status: "Pending" },
-    { id: 102, category: "Ổ chuột", location: "361 Ngô Quyền", status: "Pending" },
-    { id: 103, category: "Ổ Gà", location: "361 Ngô Quyền", status: "Pending" },
-  ];
+  const [userInfo, setUserInfo] = useState({
+    fullName: "Citizen",
+    role: "Smart-City Resident"
+  });
 
-  const avatarSrc = "frontend/src/assets/city_night.jpg"; // <-- CHANGE TO YOUR URL
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+
+    if (storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+
+        let displayRole = "Resident";
+        if (parsedUser.role) {
+          displayRole =
+            parsedUser.role.charAt(0).toUpperCase() +
+            parsedUser.role.slice(1);
+        }
+
+        setUserInfo({
+          fullName: parsedUser.fullName || "Citizen",
+          role: displayRole
+        });
+      } catch (err) {
+        console.error("Error parsing user info:", err);
+      }
+    }
+
+    const fetchRecentReports = async () => {
+      try {
+        const res = await axios.get(
+          "http://localhost:5000/api/incidents/public"
+        );
+
+        if (res.data.success) {
+          const recentData = res.data.data.slice(0, 5);
+
+          const mappedReports = recentData.map((item) => ({
+            id: `R-${item._id.slice(-6).toUpperCase()}`,
+            category: item.type_id?.name || "Incident",
+            location: item.address,
+            status: mapStatus(item.status)
+          }));
+
+          setReports(mappedReports);
+        }
+      } catch (error) {
+        console.error("Failed to load recent reports:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecentReports();
+  }, []);
+
+  const mapStatus = (status) => {
+    const statusMap = {
+      reported: "New Report",
+      assigned: "Assigned",
+      in_progress: "In Progress",
+      completed: "Completed",
+      rejected: "Rejected"
+    };
+    return statusMap[status] || "Pending";
+  };
 
   return (
     <Box
       sx={{
-        p: 4,
-        minHeight: "100vh",
-        background: "radial-gradient(circle at 20% 20%, #1a1f40 0%, #0c0f26 70%)",
-        color: "white",
         position: "relative",
-        overflow: "hidden",
+        padding: "40px",
+        minHeight: "100vh",
+        color: "white",
+        overflow: "hidden"
       }}
     >
-      {/* FLOATING BG HALOS */}
       <Box
         sx={{
           position: "absolute",
@@ -47,7 +106,7 @@ export default function UserHomePage() {
           background: "rgba(56,189,248,0.15)",
           filter: "blur(120px)",
           top: 60,
-          left: -80,
+          left: -80
         }}
       />
       <Box
@@ -59,58 +118,65 @@ export default function UserHomePage() {
           background: "rgba(129,140,248,0.18)",
           filter: "blur(140px)",
           bottom: 80,
-          right: -40,
+          right: -40
         }}
       />
 
-      {/* ===================== HERO SECTION ===================== */}
-      <Grid container
-        sx={{
-          justifyContent: "space-around"
-        }}
-      >
-        {/* LEFT: TEXT */}
-        <Grid size={6}>
-        <UserIntroCard username="LocNg"/>
+      <Grid container sx={{ justifyContent: "space-around" }}>
+        <Grid item xs={6}>
+          <UserIntroCard username={userInfo.fullName} />
         </Grid>
-        {/* RIGHT: AVATAR PANEL */}
-        <Grid size="auto">
-        <UserProfileCard avatarSrc={""}/>
+
+        <Grid item xs="auto">
+          <UserProfileCard
+            name={userInfo.fullName}
+            role={userInfo.role}
+            avatarSrc=""
+          />
         </Grid>
       </Grid>
 
-      {/* ===================== SHORTCUT FEATURE CARDS ===================== */}
-      <Grid container spacing={3} sx={{ mt: 5, justifyContent: "space-around" }}>
+      <Grid
+        container
+        spacing={3}
+        sx={{ mt: 5, justifyContent: "space-around" }}
+      >
         <FeatureCard
           icon={<ReportProblemIcon sx={{ fontSize: 42 }} />}
           title="Report an Issue"
-          desc="Submit a report instantly with images and location."
+          desc="Quickly submit reports with images and location."
           color="#fca5a5"
-          href="/report-problem"
+          href="/user/report-problem"
         />
         <FeatureCard
           icon={<ListAltIcon sx={{ fontSize: 42 }} />}
           title="Track My Reports"
-          desc="Follow your submitted issues in real time."
+          desc="Monitor the progress of your submitted issues."
           color="#93c5fd"
-          href="/my-reports"
+          href="/user/my-reports"
         />
         <FeatureCard
           icon={<AccessTimeIcon sx={{ fontSize: 42 }} />}
           title="View History"
-          desc="Review all resolved issues in one place."
+          desc="Review your completed incident history."
           color="#c4b5fd"
-          href="/history"
+          href="/user/my-reports"
         />
       </Grid>
 
-      {/* ===================== RECENT REPORTS ===================== */}
-    <RecentReportsCard reports={sampleReports} />
+      <Box sx={{ mt: 4 }}>
+        {loading ? (
+          <Box sx={{ display: "flex", justifyContent: "center" }}>
+            <CircularProgress sx={{ color: "white" }} />
+          </Box>
+        ) : (
+          <RecentReportsCard reports={reports} />
+        )}
+      </Box>
     </Box>
   );
 }
 
-/* ===== Reusable Feature Card ===== */
 function FeatureCard({ icon, title, desc, color, href }) {
   return (
     <Grid item xs={12} md={4}>
@@ -127,8 +193,8 @@ function FeatureCard({ icon, title, desc, color, href }) {
           cursor: "pointer",
           "&:hover": {
             transform: "translateY(-6px)",
-            boxShadow: `0 0 24px ${color}55`,
-          },
+            boxShadow: `0 0 24px ${color}55`
+          }
         }}
       >
         <Avatar
@@ -136,16 +202,21 @@ function FeatureCard({ icon, title, desc, color, href }) {
             bgcolor: `${color}33`,
             width: 64,
             height: 64,
-            color: color,
+            color: color
           }}
         >
           {icon}
         </Avatar>
-
-        <Typography variant="h6" sx={{ mt: 2, fontWeight: 700 }}>
+        <Typography
+          variant="h6"
+          sx={{ mt: 2, fontWeight: 700, color: "white" }}
+        >
           {title}
         </Typography>
-        <Typography variant="body2" sx={{ opacity: 0.7, mt: 1 }}>
+        <Typography
+          variant="body2"
+          sx={{ opacity: 0.7, mt: 1, color: "white" }}
+        >
           {desc}
         </Typography>
       </Card>

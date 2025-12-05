@@ -65,7 +65,9 @@ export default function AuthLogin() {
         const { token, user } = data;
         localStorage.setItem('token', data.token);
         localStorage.setItem('role', user.role);
-
+        
+        localStorage.setItem('user', JSON.stringify(user));
+        
         if (user.role === 'authority') navigate('/admin/dashboard');
         else if (user.role === 'technician') navigate('/engineer/dashboard');
         else navigate('/user/home');

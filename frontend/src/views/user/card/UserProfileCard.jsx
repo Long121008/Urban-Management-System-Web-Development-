@@ -3,7 +3,7 @@ import { Card, Avatar, Typography, Box, Grid } from "@mui/material";
 
 export default function UserProfileCard({
   avatarSrc,
-  name = "Loc Nguyen",
+  name = "Citizen",
   role = "Smart-City Citizen",
   stats = [
     { num: "12", label: "Pending" },
