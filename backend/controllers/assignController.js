@@ -2,6 +2,7 @@ const Incident = require('../models/Incident');
 const IncidentType = require('../models/IncidentType');
 const User = require('../models/User');
 
+// Display all incidents on admin page
 exports.getIncidentsForAssignment = async (req, res) => {
   try {
     const { page = 1, limit = 10, search = '', status = '', sort = 'newest' } = req.query;
@@ -44,16 +45,25 @@ exports.getIncidentsForAssignment = async (req, res) => {
   }
 };
 
+// Assign Engineer to an Incident
 exports.assignEngineer = async (req, res) => {
   try {
+
     const { incidentId, engineerId } = req.body;
+
+    console.log('req.user:', req.user);
+
+    console.log(incidentId)
+    console.log(engineerId)
 
     if (!incidentId || !engineerId) {
       return res.status(400).json({ success: false, message: 'Incident ID and Engineer ID are required' });
     }
 
+    console.log("i am here")
     const incident = await Incident.findById(incidentId);
 
+    console.log("Check incident: ", incident)
     if (!incident) {
       return res.status(404).json({ success: false, message: 'Incident not found' });
     }
@@ -62,9 +72,8 @@ exports.assignEngineer = async (req, res) => {
     incident.assigned_engineer_id = engineerId;
     incident.status = 'assigned';
 
-    // Add an update log
     incident.updates.push({
-      updater_id: req.user._id, // Assuming the user making the request is logged in
+      updater_id: req.user.id, // Assuming the user making the request is logged in
       status_to: 'assigned',
       note: `Assigned to engineer with ID: ${engineerId}`,
       update_time: new Date(),

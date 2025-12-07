@@ -45,7 +45,6 @@ export default function EngineersPage() {
 
       const response = await apiGet("/api/admin/engineer", params);
       
-      console.log(response)
       if (response.success) {
         setEngineers(response.data || []);
         setTotalPages(response.totalPages || 1);
@@ -63,29 +62,7 @@ export default function EngineersPage() {
     fetchEngineers();
   }, [page, search]);
 
-  const getStatusChip = (status) => {
-    const colors = {
-      Active: { bg: "#D3F9D8", text: "#2B8A3E" },
-      Busy: { bg: "#FFE7D9", text: "#B93815" },
-      Offline: { bg: "#E0E0E0", text: "#555" }
-    };
-
-    const defaultColor = { bg: "#E0E0E0", text: "#555" };
-    const color = colors[status] || defaultColor;
-
-    return (
-      <Chip
-        label={status || "Unknown"}
-        sx={{
-          backgroundColor: color.bg,
-          color: color.text,
-          fontWeight: 600,
-          borderRadius: "8px",
-        }}
-      />
-    );
-  };
-
+  
   const handlePageChange = (_, value) => {
     setPage(value);
   };
@@ -173,7 +150,6 @@ export default function EngineersPage() {
                 <TableRow sx={{ backgroundColor: '#1f2229' }}>
                   <TableCell sx={{ color: '#bdbdbd', fontWeight: 700 }}>Name</TableCell>
                   <TableCell sx={{ color: '#bdbdbd', fontWeight: 700 }}>Email</TableCell>
-                  <TableCell sx={{ color: '#bdbdbd', fontWeight: 700 }}>Status</TableCell>
                   <TableCell sx={{ color: '#bdbdbd', fontWeight: 700 }}>Active Tasks</TableCell>
                   <TableCell sx={{ color: '#bdbdbd', fontWeight: 700 }}>Action</TableCell>
                 </TableRow>
@@ -183,10 +159,9 @@ export default function EngineersPage() {
               <TableBody>
                 {engineers.map((eng, idx) => (
                   <TableRow key={idx} hover sx={{ '&:hover': { backgroundColor: '#282c34' } }}>
-                    <TableCell>{eng.name}</TableCell>
+                    <TableCell>{eng.fullName}</TableCell>
                     <TableCell>{eng.email}</TableCell>
-                    <TableCell>{getStatusChip(eng.status)}</TableCell>
-                    <TableCell>{eng.tasks}</TableCell>
+                    <TableCell>{eng.activeTasks}</TableCell>
                     <TableCell>
                       <Button size="small" variant="outlined">View</Button>
                     </TableCell>

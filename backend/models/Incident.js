@@ -33,10 +33,9 @@ const IncidentRatingSchema = new Schema({
 }, { _id: false });
 
 
-// --- Schema CHÍNH (Incident) ---
 
 const incidentSchema = new Schema({
-  // --- Tham chiếu (Refs) ---
+
   reporter_id: {
     type: Schema.Types.ObjectId,
     ref: 'User',
@@ -55,7 +54,6 @@ const incidentSchema = new Schema({
     index: true
   },
 
-  // --- Dữ liệu lõi ---
   title: { type: String, required: true, trim: true },
   description: { type: String, required: true, trim: true },
   status: {
@@ -70,29 +68,29 @@ const incidentSchema = new Schema({
     default: 'medium'
   },
   address: { type: String, required: true },
-  location: { // GeoJSON
+  location: {
     type: {
       type: String,
       enum: ['Point'],
       required: true
     },
     coordinates: {
-      type: [Number], // [Longitude, Latitude]
+      type: [Number],
       required: true
     }
   },
 
-  // --- Dữ liệu NHÚNG (Embedded) ---
+
   images: [IncidentImageSchema],
   updates: [IncidentUpdateSchema],
-  assignments: [IncidentAssignmentSchema], // Lịch sử phân công
-  rating: IncidentRatingSchema // Chỉ 1 đánh giá
+  assignments: [IncidentAssignmentSchema], 
+  rating: IncidentRatingSchema 
 
 }, {
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
 });
 
-// BẮT BUỘC: Tạo index 2dsphere để query vị trí
+
 incidentSchema.index({ location: '2dsphere' });
 
 module.exports = mongoose.model('Incident', incidentSchema);

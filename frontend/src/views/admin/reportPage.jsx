@@ -175,12 +175,13 @@ export default function ReportsPage() {
       {/* Header */}
       <TableHead>
         <TableRow sx={{ backgroundColor: '#1f2229' }}>
-          <TableCell sx={{ color: '#bdbdbd', fontWeight: 700 }}>Report ID</TableCell>
           <TableCell sx={{ color: '#bdbdbd', fontWeight: 700 }}>Category</TableCell>
           <TableCell sx={{ color: '#bdbdbd', fontWeight: 700 }}>Location</TableCell>
           <TableCell sx={{ color: '#bdbdbd', fontWeight: 700 }}>Citizen</TableCell>
+          <TableCell sx={{ color: '#bdbdbd', fontWeight: 700 }}>Priority</TableCell>
           <TableCell sx={{ color: '#bdbdbd', fontWeight: 700 }}>Status</TableCell>
           <TableCell sx={{ color: '#bdbdbd', fontWeight: 700 }}>Engineer</TableCell>
+          <TableCell sx={{ color: '#bdbdbd', fontWeight: 700 }}>Reported</TableCell>
         </TableRow>
       </TableHead>
 
@@ -194,16 +195,18 @@ export default function ReportsPage() {
               '&:hover': { backgroundColor: '#282c34', cursor: 'pointer' }
             }}
           >
-            <TableCell>{row.id}</TableCell>
-            <TableCell>{row.category}</TableCell>
+            <TableCell>{row.type_id.name}</TableCell>
             <TableCell>
                     {row.location?.coordinates
                       ? `${row.location.coordinates[1]}, ${row.location.coordinates[0]}`
                       : "N/A"}
                   </TableCell>
-            <TableCell>{row.citizen}</TableCell>
+            <TableCell>{row.reporter_id.fullName}</TableCell>
+            <TableCell>{row.priority}</TableCell>
             <TableCell>{getStatusChip(row.status)}</TableCell>
             <TableCell>{row.engineer}</TableCell>
+            <TableCell>{new Date(row.created_at).toLocaleString()}</TableCell>
+
           </TableRow>
         ))}
       </TableBody>

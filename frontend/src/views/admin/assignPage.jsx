@@ -41,7 +41,7 @@ export default function AssignCustomerPage() {
 
   const [openRow, setOpenRow] = useState(null);
   const [selectedEngineer, setSelectedEngineer] = useState("");
-  const engineers = ["John Doe", "Emily Tran", "Robert Lee"];
+  const [engineers, setEngineers] = useState([]);
 
   const limit = 10;
 
@@ -57,8 +57,9 @@ export default function AssignCustomerPage() {
           sort: so || ''
         });
 
-        const response = await apiGet(`/api/admin/assign`, params);
-
+        const response = await apiGet(`/api/admin/assign/incidents`, params);
+        
+        console.log("Check all incidents: ", response)
         if (response.success) {
           setReports(response.data || []);
           setTotalPages(response.totalPages || 1);
@@ -74,24 +75,48 @@ export default function AssignCustomerPage() {
     [search, statusFilter, page, sort]
   );
 
+  const loadAvailableEngineers = useCallback(async () => {
+  try {
+    const response = await apiGet(`/api/admin/engineer/available`);
+    if (response.success) {
+      setEngineers(response.data || []); // Store full engineer objects
+    } else {
+      console.error('Failed to fetch engineers:', response.message);
+    }
+  } catch (err) {
+    console.error('Error fetching engineers:', err);
+  }
+}, []);
   // debounce search
-  const debounced = useMemo(() => debounce((val) => {
-    setPage(1);
-    loadReports({ q: val, p: 1 });
-  }, 400), [loadReports]);
-
   useEffect(() => {
     loadReports();
-    return () => debounced.cancel();
-  }, [loadReports, debounced]);
+    loadAvailableEngineers(); // Fetch engineers when the component mounts
+  }, [loadReports, loadAvailableEngineers]);
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
     debounced(e.target.value);
   };
 
-  const handleAssigned = () => {
-    loadReports(); // refresh after assignment
+
+
+  const handleAssigned = async (reportId) => {
+    try {
+      const response = await apiPost(`/api/admin/assign/assign_engineer`, {
+        incidentId: reportId, // Pass the incident ID
+        engineerId: selectedEngineer, // Pass the selected engineer ID
+      });
+
+      if (response.success) {
+        alert("Engineer assigned successfully!");
+        loadReports(); // Refresh the list of reports after assignment
+      } else {
+        alert(response.message || "Failed to assign engineer.");
+      }
+    } catch (err) {
+      console.error("Error assigning engineer:", err);
+      alert("Failed to assign engineer.");
+    }
   };
 
   return (
@@ -182,13 +207,11 @@ export default function AssignCustomerPage() {
 
     <TableHead>
       <TableRow >
-        <TableCell sx={{}}>ID</TableCell>
+        <TableCell sx={{ color: '#bdbdbd', minWidth: 120 }}></TableCell>
         <TableCell sx={{ color: '#bdbdbd', minWidth: 120 }}>Category</TableCell>
-        <TableCell sx={{ color: '#bdbdbd', minWidth: 160 }}>Location</TableCell>
         <TableCell sx={{ color: '#bdbdbd', minWidth: 140 }}>Citizen</TableCell>
         <TableCell sx={{ color: '#bdbdbd', minWidth: 120 }}>Status</TableCell>
         <TableCell sx={{ color: '#bdbdbd', minWidth: 140 }}>Engineer</TableCell>
-        <TableCell sx={{ color: '#bdbdbd', minWidth: 80 }} />
       </TableRow>
     </TableHead>
 
@@ -219,17 +242,13 @@ export default function AssignCustomerPage() {
       <TableCell>
         {openRow === r._id ? <ExpandLessIcon /> : <ExpandMoreIcon />}
       </TableCell>
-
-      <TableCell>{r._id}</TableCell>
-      <TableCell>{r.type || "N/A"}</TableCell>
-      <TableCell>
-        {r.location?.coordinates
-          ? `${r.location.coordinates[1]}, ${r.location.coordinates[0]}`
-          : "N/A"}
-      </TableCell>
-      <TableCell>{r.citizen || "N/A"}</TableCell>
-      <TableCell>{r.status}</TableCell>
-      <TableCell>{r.engineer || "Unassigned"}</TableCell>
+        <TableCell>{r.type_id.name}</TableCell>
+        
+      <TableCell>{r.reporter_id.fullName}</TableCell>
+      <TableCell>{r.status || "N/A"}</TableCell>
+      
+      <TableCell>  {r.assigned_engineer_id ? r.assigned_engineer_id.fullName : "N/A"}
+</TableCell>
     </TableRow>
 
     {/* Expanded Row */}
@@ -258,11 +277,13 @@ export default function AssignCustomerPage() {
               <Select
                 size="small"
                 value={selectedEngineer}
-                onChange={(e) => setSelectedEngineer(e.target.value)}
-                sx={{ width: 200, background: "#23272f", color: "white" }}
+                onChange={(e) => setSelectedEngineer(e.target.value)} // Set the engineer ID
+                sx={{ width: 200, background: "#07090cff", color: "white" }}
               >
                 {engineers.map((eng) => (
-                  <MenuItem value={eng} key={eng}>{eng}</MenuItem>
+                  <MenuItem value={eng._id} key={eng._id}>
+                    {eng.fullName} {/* Display the full name */}
+                  </MenuItem>
                 ))}
               </Select>
 
@@ -271,7 +292,7 @@ export default function AssignCustomerPage() {
                 size="small"
                 onClick={() => {
                   console.log("Assign engineer:", selectedEngineer);
-                  handleAssigned();
+                  handleAssigned(r._id);
                 }}
               >
                 Assign

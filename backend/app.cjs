@@ -25,8 +25,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use('/api/auth', require('./routes/auth'));
 
 // USER
-app.use('/api/incidents', require('./routes/incidentRoutes'));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/api/user/incidents', require('./routes/incidentRoutes'));
+app.use('api/user/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ADMIN
 app.use('/api/admin/assign', require('./routes/admin/assignRoutes'));
