@@ -33,6 +33,9 @@ app.use('/api/admin/assign', require('./routes/admin/assignRoutes'));
 app.use('/api/admin/engineer', require('./routes/admin/adminEngineerRoutes'));
 app.use('/api/admin/reports', require('./routes/admin/adminAllReports'));
 
+// EGNINEER
+app.use('/api/engineer', require('./routes/engineer/engineerRoutes'));
+
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({

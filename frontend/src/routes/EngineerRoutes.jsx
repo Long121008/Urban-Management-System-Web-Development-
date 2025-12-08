@@ -13,7 +13,6 @@ const HistoryPage = Loadable(lazy(() => import('views/engineer/historyPage')));
 const MyTaskPage = Loadable(lazy(() => import('views/engineer/myTaskPage')));
 
 
-// ==============================|| MAIN ROUTING ||============================== //
 
 const EngineerRoutes = {
   path: '/engineer',
@@ -32,9 +31,11 @@ const EngineerRoutes = {
       element: <MyTaskPage />
     },
     {
-      path: 'task_update',
+      
+      path: 'update/:id', 
       element: <TaskUpdatePage />
     },
+
     {
       path: 'history',
       element: <HistoryPage />

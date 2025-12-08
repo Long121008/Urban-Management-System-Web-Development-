@@ -32,14 +32,6 @@ const utilities = {
       breadcrumbs: false
     },
     {
-      id: 'util-task_update',
-      title: 'Task Updates',
-      type: 'item',
-      url: '/engineer/task_update',
-      icon: icons.EngineeringIcon,
-      breadcrumbs: false
-    },
-    {
       id: 'util-history',
       title: 'History',
       type: 'item',
