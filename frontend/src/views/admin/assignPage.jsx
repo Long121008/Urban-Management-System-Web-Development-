@@ -28,7 +28,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { Collapse } from "@mui/material";
 import { apiGet, apiPost } from '../../utils/api';
-
+import StatusChip from '../../ui-component/admin/StatusChip';
 
 export default function AssignCustomerPage() {
   const [sort, setSort] = useState('newest');
@@ -40,7 +40,8 @@ export default function AssignCustomerPage() {
   const [loading, setLoading] = useState(false);
 
   const [openRow, setOpenRow] = useState(null);
-  const [selectedEngineer, setSelectedEngineer] = useState("");
+  const [selectedEngineer, setSelectedEngineer] = useState({});
+
   const [engineers, setEngineers] = useState([]);
 
   const limit = 10;
@@ -120,7 +121,7 @@ export default function AssignCustomerPage() {
   };
 
   return (
-    <Box sx={{ p: 3, background: 'linear-gradient(135deg, #23272f 0%, #2c313a 100%)', minHeight: '100vh', color: '#e0e0e0' }}>
+    <Box sx={{ p: 3, minHeight: '100vh', color: '#e0e0e0' }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <div>
           <Typography variant="h4" sx={{ fontWeight: 600 }}>All Customers</Typography>
@@ -245,7 +246,7 @@ export default function AssignCustomerPage() {
         <TableCell>{r.type_id.name}</TableCell>
         
       <TableCell>{r.reporter_id.fullName}</TableCell>
-      <TableCell>{r.status || "N/A"}</TableCell>
+      <TableCell><StatusChip status={r.status} /></TableCell>
       
       <TableCell>  {r.assigned_engineer_id ? r.assigned_engineer_id.fullName : "N/A"}
 </TableCell>

@@ -19,6 +19,7 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import { apiGet, apiPost } from "../../utils/api";
 import AddEngineer from "./addEngineer";
+import StatusChip from "../../ui-component/admin/StatusChip";
 
 export default function ReportsPage() {
   const [sort, setSort] = useState("newest");
@@ -41,9 +42,11 @@ export default function ReportsPage() {
       });
 
       const response = await apiGet("/api/admin/reports", params);
-    
+      
+      console.log(response)
+      
       if (response.success) {
-        console.log("I am here")
+
         setReports(response.data || []);
         setTotalPages(response.totalPages || 1);
       } else {
@@ -61,29 +64,9 @@ export default function ReportsPage() {
     fetchReports();
   }, [page, sort, search]);
 
-  const getStatusChip = (status) => {
-    const colors = {
-      Pending: { bg: "#FFF4CC", text: "#8A6D00" },
-      Assigned: { bg: "#E0F2FF", text: "#035388" },
-      "In Progress": { bg: "#FFE7D9", text: "#B93815" },
-      Completed: { bg: "#D3F9D8", text: "#2B8A3E" }
-    };
-
-    return (
-      <Chip
-        label={status}
-        sx={{
-          backgroundColor: colors[status]?.bg,
-          color: colors[status]?.text,
-          fontWeight: 600,
-          borderRadius: "8px"
-        }}
-      />
-    );
-  };
 
   return (
-    <Box sx={{ p: 3, background: 'linear-gradient(135deg, #23272f 0%, #2c313a 100%)', minHeight: '100vh', color: '#e0e0e0' }}>
+    <Box sx={{ p: 3, minHeight: '100vh', color: '#e0e0e0' }}>
       {/* Page Title */}
       <Typography variant="h4" sx={{ fontWeight: 700, mb: 1, color: '#e0e0e0' }}>
         All Reports
@@ -152,7 +135,6 @@ export default function ReportsPage() {
   sx={{
     p: 0,
     borderRadius: 3,
-    background: 'linear-gradient(135deg, #23272f 0%, #2c313a 100%)',
     boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
     color: '#e0e0e0',
     border: '1px solid #444'
@@ -203,8 +185,9 @@ export default function ReportsPage() {
                   </TableCell>
             <TableCell>{row.reporter_id.fullName}</TableCell>
             <TableCell>{row.priority}</TableCell>
-            <TableCell>{getStatusChip(row.status)}</TableCell>
-            <TableCell>{row.engineer}</TableCell>
+            <TableCell><StatusChip status={row.status} /></TableCell>
+            
+            <TableCell>{row.assigned_engineer_id ? row.assigned_engineer_id.fullName : "N/A"}</TableCell>
             <TableCell>{new Date(row.created_at).toLocaleString()}</TableCell>
 
           </TableRow>

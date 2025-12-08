@@ -27,7 +27,7 @@ exports.getAllReports = async (req, res) => {
     const reports = await Incident.find(query)
       .populate('reporter_id', 'fullName email') // Populate reporter details
       .populate('type_id', 'name') // Populate incident type
-      .populate('assigned_engineer_id', 'name') // Populate assigned team
+      .populate('assigned_engineer_id', 'fullName email') // Populate assigned team
       .sort(sortBy)
       .skip(skip)
       .limit(parseInt(limit));

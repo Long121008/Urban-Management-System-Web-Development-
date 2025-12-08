@@ -83,7 +83,7 @@ export default function EngineersPage() {
         fetchEngineers(); // refresh list after adding
       }} />
     ) : (
-      <Box sx={{ p: 3, background: 'linear-gradient(135deg, #23272f 0%, #2c313a 100%)', minHeight: '100vh', color: '#e0e0e0' }}>
+      <Box sx={{ p: 3, minHeight: '100vh', color: '#e0e0e0' }}>
         
         {/* Title */}
         <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
@@ -131,7 +131,7 @@ export default function EngineersPage() {
         </Grid>
 
         {/* Table */}
-        <Card sx={{ p: 0, borderRadius: 3, background: 'linear-gradient(135deg, #23272f 0%, #2c313a 100%)', border: '1px solid #444' }}>
+        <Card sx={{ p: 0, borderRadius: 3, border: '1px solid #444' }}>
           <TableContainer sx={{ maxHeight: 500 }}>
             <Table stickyHeader sx={{
     '& .MuiTableCell-stickyHeader': {
@@ -151,7 +151,6 @@ export default function EngineersPage() {
                   <TableCell sx={{ color: '#bdbdbd', fontWeight: 700 }}>Name</TableCell>
                   <TableCell sx={{ color: '#bdbdbd', fontWeight: 700 }}>Email</TableCell>
                   <TableCell sx={{ color: '#bdbdbd', fontWeight: 700 }}>Active Tasks</TableCell>
-                  <TableCell sx={{ color: '#bdbdbd', fontWeight: 700 }}>Action</TableCell>
                 </TableRow>
               </TableHead>
 
@@ -162,9 +161,6 @@ export default function EngineersPage() {
                     <TableCell>{eng.fullName}</TableCell>
                     <TableCell>{eng.email}</TableCell>
                     <TableCell>{eng.activeTasks}</TableCell>
-                    <TableCell>
-                      <Button size="small" variant="outlined">View</Button>
-                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

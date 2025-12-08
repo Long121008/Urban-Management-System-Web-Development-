@@ -59,7 +59,7 @@ const incidentSchema = new Schema({
   status: {
     type: String,
     required: true,
-    enum: ['reported', 'assigned', 'in_progress', 'completed', 'reopened', 'rejected'],
+    enum: ['reported', 'assigned', 'in_progress', 'completed'],
     default: 'reported'
   },
   priority: {

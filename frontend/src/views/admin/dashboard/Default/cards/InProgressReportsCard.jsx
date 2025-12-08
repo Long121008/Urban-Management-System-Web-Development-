@@ -9,7 +9,6 @@ export default function InProgressReportsCard({ isLoading }) {
       className="card"
       style={{
         height: '100%',
-        background: 'linear-gradient(135deg, #23272f 0%, #2c313a 100%)',
         color: '#e0e0e0',
         borderRadius: 12,
         boxShadow: '0 2px 8px rgba(0,0,0,0.12)'

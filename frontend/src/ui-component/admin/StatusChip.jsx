@@ -1,26 +1,28 @@
-// src/components/StatusChip.jsx
-import React from 'react';
-import Chip from '@mui/material/Chip';
-import { useTheme } from '@mui/material/styles';
+import { Chip } from "@mui/material";
 
 export default function StatusChip({ status }) {
-  const theme = useTheme();
-  const s = (status || '').toLowerCase();
+  const colorMap = {
+    reported: { bg: "#2196F3", text: "#fff" },
+    assigned: { bg: "#4CAF50", text: "#fff" },
+    in_progress: { bg: "#FF9800", text: "#fff" },
+    completed: { bg: "#9C27B0", text: "#fff" },
+    reopened: { bg: "#FFC107", text: "#000" },
+    rejected: { bg: "#F44336", text: "#fff" },
+  };
 
-  let color = 'default';
-  let sx = { color: theme.palette.text.primary, backgroundColor: 'transparent' };
+  const colors = colorMap[status] || { bg: "#9E9E9E", text: "#fff" };
 
-  if (s.includes('pending')) {
-    sx = { backgroundColor: 'rgba(245,158,11,0.12)', color: '#f59e0b' };
-  } else if (s.includes('in progress') || s.includes('assigned')) {
-    sx = { backgroundColor: 'rgba(59,130,246,0.12)', color: '#3b82f6' };
-  } else if (s.includes('resolved') || s.includes('done') || s.includes('completed')) {
-    sx = { backgroundColor: 'rgba(34,197,94,0.12)', color: '#22c55e' };
-  } else if (s.includes('critical') || s.includes('urgent')) {
-    sx = { backgroundColor: 'rgba(239,68,68,0.12)', color: '#ef4444' };
-  } else {
-    sx = { backgroundColor: 'rgba(147,197,253,0.06)', color: theme.palette.text.primary };
-  }
-
-  return <Chip label={status} size="small" sx={{ fontWeight: 600, ...sx }} />;
+  return (
+    <Chip
+      label={status.replace(/_/g, " ")}
+      sx={{
+        backgroundColor: colors.bg,
+        color: colors.text,
+        fontWeight: 600,
+        height: "28px",
+        borderRadius: "6px",
+        textTransform: "capitalize",
+      }}
+    />
+  );
 }

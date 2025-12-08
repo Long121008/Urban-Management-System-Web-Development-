@@ -25,7 +25,6 @@ export default function ReportsByCategoryChart() {
     <Card
       sx={{
         height: '100%',
-        background: 'linear-gradient(135deg, #23272f 0%, #2c313a 100%)',
         boxShadow: 2,
         borderRadius: 2,
         color: '#e0e0e0'

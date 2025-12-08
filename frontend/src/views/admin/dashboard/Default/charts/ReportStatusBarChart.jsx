@@ -8,7 +8,8 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend
+  Legend,
+  Cell
 } from 'recharts';
 
 // Mock data — replace later with backend API data
@@ -20,7 +21,12 @@ const data = [
 ];
 
 // Define colors for each status
-const COLORS = ['#FFB300', '#42A5F5', '#66BB6A', '#2E7D32'];
+const COLORS = [
+  '#4FC3F7', // Chờ xử lý – soft blue
+  '#64B5F6', // Đã phân công – mid blue
+  '#81C784', // Đang xử lý – soft green
+  '#4CAF50'  // Hoàn tất – solid green
+];
 
 export default function ReportStatusBarChart() {
   return (
@@ -28,9 +34,7 @@ export default function ReportStatusBarChart() {
       sx={{
         height: '100%',
         boxShadow: 2,
-        borderRadius: 2,
-        backgroundColor: '#FAFAFA'
-      }}
+        borderRadius: 2      }}
     >
       <CardContent>
         <Typography variant="h6" gutterBottom>
@@ -51,9 +55,12 @@ export default function ReportStatusBarChart() {
                 contentStyle={{ backgroundColor: '#fff', borderRadius: '8px' }}
               />
               <Legend verticalAlign="bottom" height={36} />
-              <Bar dataKey="count" name="Số báo cáo">
+              <Bar dataKey="count" name="Số báo cáo" radius={[6, 6, 0, 0]}>
                 {data.map((entry, index) => (
-                  <cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
                 ))}
               </Bar>
             </BarChart>
