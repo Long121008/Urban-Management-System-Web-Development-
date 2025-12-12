@@ -6,7 +6,7 @@ This project is a web-based urban management system designed to handle incidents
 
 Before running the project, ensure you have the following installed:
 
-- **Node.js** (v16 or higher)
+- **Node.js** (v16 or higher v17,18..)
 - **Yarn** (Package manager)
 - **MongoDB** (Database)
 - **Conda** (Optional for Python environments)
